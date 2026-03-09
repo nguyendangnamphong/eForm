@@ -19,5 +19,19 @@
   },
   "scripts": {
     "prettier:format": "prettier --write \"{,src/**/}*.{md,json,yml}\""
+  },
+  "main": ".lintstagedrc.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nguyendangnamphong/eForm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/nguyendangnamphong/eForm/issues"
+  },
+  "homepage": "https://github.com/nguyendangnamphong/eForm#readme",
+  "dependencies": {
+    "puppeteer": "^10.4.0"
   }
 }

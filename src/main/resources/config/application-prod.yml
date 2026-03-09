@@ -18,7 +18,7 @@ logging:
   level:
     ROOT: DEBUG
     io.github.jhipster: DEBUG
-    com.fis.fpt: DEBUG
+    com.vnu.uet: DEBUG
 
 eureka:
   instance:

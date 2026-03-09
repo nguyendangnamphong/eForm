@@ -18,7 +18,7 @@ logging:
   level:
     ROOT: DEBUG
     io.github.jhipster: DEBUG
-    com.fis.fpt: DEBUG
+    com.vnu.uet: DEBUG
 
 eureka:
   instance:
@@ -26,7 +26,8 @@ eureka:
   client:
     service-url:
 #      defaultZone: http://admin:${jhipster.registry.password}@10.15.68.24:8761/eureka/
-      defaultZone: http://admin:${jhipster.registry.password}@10.14.121.18:30500/eureka/
+#      defaultZone: http://admin:${jhipster.registry.password}@10.14.121.18:30500/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 spring:
   codec:

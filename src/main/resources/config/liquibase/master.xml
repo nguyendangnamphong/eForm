@@ -16,10 +16,6 @@
     <include file="config/liquibase/changelog/20240123040628_added_entity_Form.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240123040728_added_entity_Acl.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240123040828_added_entity_Version.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20240123040928_added_entity_StorageFile.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20240123041028_added_entity_Procedures.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20240123041128_added_entity_ApiInfo.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20251015081059_added_entity_VariableSystem.xml" relativeToChangelogFile="false" />
-    <include file="config/liquibase/changelog/20251015081159_added_entity_VariableSystemAcl.xml" relativeToChangelogFile="false" />
 </databaseChangeLog>
