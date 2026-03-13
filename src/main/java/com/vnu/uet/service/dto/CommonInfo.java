@@ -7,6 +7,7 @@ import lombok.Data;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+
 @Data
 public class CommonInfo {
     public String formCode;
@@ -27,11 +28,13 @@ public class CommonInfo {
     private String versionId;
 
     public CommonInfo(Form form) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        ;
         this.formName = form.getFormName();
         this.formId = form.getFormId();
         this.describeForm = form.getDescription();
-        if(!(form.getTag().equals(""))) {
+        if (!(form.getTag().equals(""))) {
             this.tag = form.getTag().split(",");
         }
         this.formCode = form.getFormCode();
@@ -49,11 +52,13 @@ public class CommonInfo {
     }
 
     public CommonInfo(Form form, String versionId) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        ;
         this.formName = form.getFormName();
         this.formId = form.getFormId();
         this.describeForm = form.getDescription();
-        if(!(form.getTag().equals(""))) {
+        if (!(form.getTag().equals(""))) {
             this.tag = form.getTag().split(",");
         }
         this.formCode = form.getFormCode();
@@ -72,11 +77,13 @@ public class CommonInfo {
     }
 
     public CommonInfo(Version version) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        ;
         this.formName = version.getFormName();
         this.formId = version.getFormId();
         this.describeForm = version.getDescription();
-        if(!(version.getTag().equals(""))) {
+        if (version.getTag() != null && !version.getTag().isEmpty()) {
             this.tag = version.getTag().split(",");
         }
         this.formCode = version.getFormCode();

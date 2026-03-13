@@ -111,6 +111,13 @@ public class OwnerResources {
         return ResponseEntity.ok(gson.toJson(formDtos));
     }
 
+    @GetMapping("/menu-views")
+    public ResponseEntity<String> getMenuViews(Pageable pageable) throws Exception {
+        FormSearchOwnerDto formSearchOwnerDto = new FormSearchOwnerDto();
+        Page<FormDto> formDtos = ownerService.findFormOwner1(formSearchOwnerDto, pageable);
+        return ResponseEntity.ok(gson.toJson(formDtos.getContent()));
+    }
+
     @GetMapping("/form/change-status")
     public ResponseEntity<String> changeStatusRelease(@RequestParam String formId) throws Exception {
         if (!formRepository.existsByFormId(formId)) {

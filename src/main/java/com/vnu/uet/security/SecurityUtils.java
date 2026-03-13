@@ -13,8 +13,11 @@ public final class SecurityUtils {
 
     public static UserInFoDetails getInfoCurrentUserLogin() {
         UserInFoDetails user = new UserInFoDetails();
+        user.setId(1L);
         user.setLogin("admin");
         user.setEmail("admin@localhost");
+        user.setOrgIn("/1/1");
+        user.setCustId(1L);
         return user;
     }
 

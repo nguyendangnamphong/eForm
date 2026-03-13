@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Data
 public class FormDto {
@@ -44,9 +45,14 @@ public class FormDto {
     private String codeJson;
     private String configWriter;
 
-    public FormDto(String formId, String formName, Long statusForm, Instant createdDate, String tag, Instant beginTime, Instant endTime, Instant updateAt, String jsonForm, String describeForm, String formCode, String jsonFormCondition, String createdBy, Long userId, String orgIn, Long custId, String codeJson, String configWriter) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+    public FormDto(String formId, String formName, Long statusForm, Instant createdDate, String tag, Instant beginTime,
+            Instant endTime, Instant updateAt, String jsonForm, String describeForm, String formCode,
+            String jsonFormCondition, String createdBy, Long userId, String orgIn, Long custId, String codeJson,
+            String configWriter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
         this.formName = formName;
         if (statusForm == 1L) {
             this.statusForm = "draft";
@@ -90,9 +96,13 @@ public class FormDto {
 
     }
 
-    public FormDto(String formId, String formName, Long statusForm, Instant createdDate, String tag, Instant beginTime, Instant endTime, Instant updateAt, String describeForm, String formCode, String createdBy, Long userId, String orgIn, Long custId, String configWriter) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+    public FormDto(String formId, String formName, Long statusForm, Instant createdDate, String tag, Instant beginTime,
+            Instant endTime, Instant updateAt, String describeForm, String formCode, String createdBy, Long userId,
+            String orgIn, Long custId, String configWriter) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
         this.formName = formName;
         if (statusForm == 1L) {
             this.statusForm = "draft";
@@ -137,21 +147,18 @@ public class FormDto {
     }
 
     public static FormDto formTODto(Form form) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.of("Asia/Ho_Chi_Minh"));
         FormDto formDto = new FormDto();
         formDto.formId = form.getFormId();
         formDto.formName = form.getFormName();
-//        formDto.statusForm = form.getStatusForm();
-        if(form.getStatusForm()==1L){
+        if (form.getStatusForm() == 1L) {
             formDto.statusForm = "draff";
-        }
-        else if(form.getStatusForm()==2L){
+        } else if (form.getStatusForm() == 2L) {
             formDto.statusForm = "releasing";
-        }
-        else if (form.getStatusForm()==4L){
+        } else if (form.getStatusForm() == 4L) {
             formDto.statusForm = "editing";
-        }
-        else{
+        } else {
             formDto.statusForm = "stop release";
         }
         formDto.userId = form.getUserId();
@@ -159,31 +166,33 @@ public class FormDto {
         formDto.orgIn = form.getOrgIn();
         formDto.createdBy = form.getCreatedBy();
         formDto.createdDate = formatter.format(form.getCreatedDate());
-        formDto.tag = form.getTag().split(",");
+        if (form.getTag() != null && !form.getTag().isEmpty()) {
+            formDto.tag = form.getTag().split(",");
+        }
         formDto.beginTime = formatter.format(form.getBeginTime());
         formDto.endTime = formatter.format(form.getEndTime());
         formDto.updateAt = formatter.format(form.getLastModifiedDate());
         formDto.jsonForm = form.getJsonForm();
         formDto.describeForm = form.getDescription();
         formDto.formCode = form.getFormCode();
-        formDto.jsonFormCondition = formDto.getJsonFormCondition();
+        formDto.jsonFormCondition = form.getJsonFormCondition();
         formDto.codeJson = form.getCodeJson();
         formDto.configWriter = form.getConfigWriter();
         ZoneId zoneId = ZoneId.systemDefault();
 
         Instant currentTime = Instant.now();
-        if (form.getStatusForm().equals("draft") || form.getStatusForm().equals("stop release") || form.getStatusForm().equals("editing")) {
+        if (Objects.equals(form.getStatusForm(), 1L) || Objects.equals(form.getStatusForm(), 3L)
+                || Objects.equals(form.getStatusForm(), 4L)) {
             formDto.fix = true;
             formDto.stopRelease = false;
             if (currentTime.isBefore(form.getEndTime())) {
                 formDto.release = true;
             }
         }
-        if (form.getStatusForm().equals("stop release")) {
+        if (Objects.equals(form.getStatusForm(), 3L)) {
             formDto.extendValidity = false;
         }
         return formDto;
     }
-
 
 }
