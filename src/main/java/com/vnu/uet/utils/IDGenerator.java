@@ -26,12 +26,14 @@ public class IDGenerator {
         Hashids hashIds = new Hashids("This is salt");
         return 1 + hashIds.encode(newNumbers);
     }
+
     public static String generateIDSuffix(Long userId) {
         UserInFoDetails userInfo = SecurityUtils.getInfoCurrentUserLogin();
-        return userInfo != null && StringUtils.isNotBlank(userInfo.getDbSuffix())
-            ? userInfo.getDbSuffix() + generate(userId)
-            : "0001" + generate(userId);
+        return userInfo != null && StringUtils.isNotBlank(userInfo.getOrgId())
+                ? userInfo.getOrgId() + generate(userId)
+                : "0001" + generate(userId);
     }
+
     public String generateKey(long... numbers) {
         long[] newNumbers;
         if (numbers != null) {

@@ -4,9 +4,11 @@ import com.vnu.uet.domain.Form;
 import com.vnu.uet.repository.FormRepository;
 import com.vnu.uet.security.SecurityUtils;
 import com.vnu.uet.security.UserInFoDetails;
+import com.vnu.uet.domain.enums.StatusForm;
+import com.vnu.uet.service.rest.client.EflowClient;
 import com.vnu.uet.service.dto.StandardResponse;
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +16,11 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/common")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CommonResource {
 
     private final FormRepository formRepository;
+    private final EflowClient eflowClient;
 
     Gson gson = new Gson();
 
@@ -47,14 +50,30 @@ public class CommonResource {
     public ResponseEntity<?> checkEdit(@RequestParam String formId) throws Exception {
         String message;
         boolean edit;
+        boolean lockStructure = false;
+
         if (!formRepository.existsById(formId)) {
             message = "Form not exist";
             edit = false;
             StandardResponse standardResponse = new StandardResponse(message, edit);
             return ResponseEntity.ok(gson.toJson(standardResponse));
         }
+
+        // Kiểm tra status từ eFlow
+        try {
+            ResponseEntity<Boolean> eflowResponse = eflowClient.isFormReleasing(formId);
+            System.out.println("DEBUG: eFlow response: " + eflowResponse.getBody());
+            if (eflowResponse.getBody() != null && eflowResponse.getBody()) {
+                lockStructure = true;
+                System.out.println("DEBUG: lockStructure set to true");
+            }
+        } catch (Exception e) {
+            // Log error or handle if eFlow is down
+            message = "Error checking form status from eFlow";
+        }
+
         Form form = formRepository.findFormByFormId(formId);
-        if (form.getStatusForm().equals("releasing")) {
+        if (Objects.equals(form.getStatusForm(), StatusForm.RELEASE.getValue())) {
             message = "Can not edit";
             edit = false;
         } else {
@@ -70,7 +89,12 @@ public class CommonResource {
                 edit = true;
             }
         }
-        StandardResponse standardResponse = new StandardResponse(message, edit);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("edit", edit);
+        data.put("lockStructure", lockStructure);
+
+        StandardResponse standardResponse = new StandardResponse(message, data);
         return ResponseEntity.ok(gson.toJson(standardResponse));
     }
 

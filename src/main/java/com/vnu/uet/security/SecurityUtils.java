@@ -17,7 +17,10 @@ public final class SecurityUtils {
         user.setLogin("admin");
         user.setEmail("admin@localhost");
         user.setOrgIn("/1/1");
+        user.setOrgId("1");
         user.setCustId(1L);
+        user.setAvatarUrl("https://s3.example.com/avatar.png");
+        user.setSignatureUrl("https://s3.example.com/signature.png");
         return user;
     }
 

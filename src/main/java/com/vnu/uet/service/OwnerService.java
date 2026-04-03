@@ -20,6 +20,7 @@ import com.vnu.uet.security.SecurityUtils;
 import com.vnu.uet.security.UserInFoDetails;
 import com.vnu.uet.service.dto.*;
 import com.vnu.uet.service.mapper.FormMapper;
+import com.vnu.uet.service.rest.client.EflowClient;
 import com.vnu.uet.utils.FormSpecification;
 import com.vnu.uet.utils.IDGenerator;
 import com.vnu.uet.web.rest.errors.FormNotPermission;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +57,8 @@ public class OwnerService {
     private final Logger logger = LoggerFactory.getLogger(OwnerService.class);
     private final FormMapper formMapper;
     private final EntityManager entityManager;
+    private final EflowClient eflowClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private Form checkFormPermission(String formId, UserInFoDetails currentUser) {
         return formRepository.findById(formId)
@@ -288,7 +292,7 @@ public class OwnerService {
      */
 
     @Transactional
-    public Form updateForm(RequestFormDto requestForm) throws JsonProcessingException {
+    public Form updateForm(RequestFormDto requestForm) throws Exception {
         UserInFoDetails currentUser = SecurityUtils.getInfoCurrentUserLogin();
         if (currentUser == null) {
             throw new FormNotPermission("User not found or not logged in");
@@ -308,6 +312,21 @@ public class OwnerService {
         originalForm.setBeginTime(form.getBeginTime());
         originalForm.setEndTime(form.getEndTime());
         originalForm.setVariableArr(form.getVariableArr());
+
+        // Check if form is being used in eFlow Release
+        boolean lockStructure = false;
+        try {
+            ResponseEntity<Boolean> eflowResponse = eflowClient.isFormReleasing(requestForm.getFormId());
+            if (eflowResponse.getBody() != null && eflowResponse.getBody()) {
+                lockStructure = true;
+            }
+        } catch (Exception e) {
+            logger.warn("Could not check eFlow status for form {}: {}", requestForm.getFormId(), e.getMessage());
+        }
+
+        if (lockStructure && requestForm.getVariableArr() != null) {
+            validateVariableCodeIntegrity(originalForm.getVariableArr(), requestForm.getVariableArr());
+        }
 
         Instant currentTime = Instant.now();
         formMapper.updateForm(requestForm, form, currentUser.getLogin(), currentTime);
@@ -432,7 +451,6 @@ public class OwnerService {
     }
 
     public void validateNoDuplicateIds(String jsonForm) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root = objectMapper.readTree(jsonForm);
 
         if (root.isArray()) {
@@ -456,6 +474,37 @@ public class OwnerService {
                     } else {
                         seenIds.put(id, node);
                     }
+                }
+            }
+        }
+    }
+
+    private void validateVariableCodeIntegrity(String oldVariableArrJson, Variable[] newVariables) throws Exception {
+        if (oldVariableArrJson == null || oldVariableArrJson.isEmpty() || newVariables == null) {
+            return;
+        }
+        JsonNode oldRoot = objectMapper.readTree(oldVariableArrJson);
+
+        if (oldRoot.isArray()) {
+            Set<String> oldCodes = new HashSet<>();
+            for (JsonNode node : oldRoot) {
+                JsonNode codeNode = node.get("code");
+                if (codeNode != null)
+                    oldCodes.add(codeNode.asText());
+            }
+
+            Set<String> newCodes = new HashSet<>();
+            for (Variable var : newVariables) {
+                if (var.getCode() != null)
+                    newCodes.add(var.getCode());
+            }
+
+            // Check if any old code is missing in new codes (deletion is not allowed if
+            // locked)
+            for (String oldCode : oldCodes) {
+                if (!newCodes.contains(oldCode)) {
+                    throw new IllegalArgumentException("Cannot delete or change existing variable code '" + oldCode
+                            + "' after form is released in eFlow");
                 }
             }
         }
