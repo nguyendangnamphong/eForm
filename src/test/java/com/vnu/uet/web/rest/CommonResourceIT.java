@@ -22,9 +22,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = EformApp.class, properties = {
-        "application.uaa-name=http://uaa",
-        "application.eflow-url=http://eflow",
-        "spring.liquibase.enabled=false"
+        "spring.liquibase.enabled=false",
+        "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL",
+        "spring.datasource.driver-class-name=org.h2.Driver",
+        "spring.datasource.username=sa",
+        "spring.datasource.password=",
+        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "application.uaa-name=http://mock-uaa",
+        "application.eflow-url=http://mock-eflow"
 })
 @AutoConfigureMockMvc
 public class CommonResourceIT {
@@ -46,6 +52,7 @@ public class CommonResourceIT {
         form.setFormId("test-id");
         form.setStatusForm(1L); // Draft
         form.setCreatedBy("admin");
+        form.setTag("");
         when(formRepository.findFormByFormId("test-id")).thenReturn(form);
         when(formRepository.findById("test-id")).thenReturn(java.util.Optional.of(form));
 

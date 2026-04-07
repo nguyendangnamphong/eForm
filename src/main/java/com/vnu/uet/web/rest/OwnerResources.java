@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -40,10 +39,8 @@ public class OwnerResources {
 
     @PostMapping("/form")
     public ResponseEntity<?> saveForm(@RequestBody @Valid RequestAddForm form) throws Exception {
-
         Form form1 = ownerService.saveForm(form);
-
-        return ResponseEntity.ok(gson.toJson(form1));
+        return ResponseEntity.ok(form1);
     }
 
     @GetMapping("/form")
@@ -52,10 +49,10 @@ public class OwnerResources {
         if (!formRepository.existsByFormId(formId)) {
             message = "FormId not exist";
             StandardResponse standardResponse = new StandardResponse(message, false);
-            return ResponseEntity.ok(gson.toJson(standardResponse));
+            return ResponseEntity.ok(standardResponse);
         }
         CommonInfo commonInfo = ownerService.getCommonInfo(formId);
-        return ResponseEntity.ok(gson.toJson(commonInfo));
+        return ResponseEntity.ok(commonInfo);
     }
 
     /*
@@ -95,20 +92,20 @@ public class OwnerResources {
      */
 
     @PutMapping("/form")
-    public ResponseEntity<String> updateForm(@RequestBody @Valid RequestFormDto requestForm) throws Exception {
+    public ResponseEntity<?> updateForm(@RequestBody @Valid RequestFormDto requestForm) throws Exception {
         if (!formRepository.existsByFormId(requestForm.getFormId())) {
             return new ResponseEntity<>("formId is not existed", HttpStatus.CONFLICT);
         }
         Form form = ownerService.updateForm(requestForm);
         FormDto formDto = FormDto.formTODto(form);
-        return ResponseEntity.ok(gson.toJson(formDto));
+        return ResponseEntity.ok(formDto);
     }
 
     @PostMapping("/find-form")
-    public ResponseEntity<String> findFormOwner(@RequestBody FormSearchOwnerDto formSearchOwnerDto, Pageable pageable)
+    public ResponseEntity<?> findFormOwner(@RequestBody FormSearchOwnerDto formSearchOwnerDto, Pageable pageable)
             throws Exception {
         Page<FormDto> formDtos = ownerService.findFormOwner1(formSearchOwnerDto, pageable);
-        return ResponseEntity.ok(gson.toJson(formDtos));
+        return ResponseEntity.ok(formDtos);
     }
 
     @GetMapping("/menu-views")
@@ -119,7 +116,7 @@ public class OwnerResources {
     }
 
     @GetMapping("/form/change-status")
-    public ResponseEntity<String> changeStatusRelease(@RequestParam String formId) throws Exception {
+    public ResponseEntity<?> changeStatusRelease(@RequestParam String formId) throws Exception {
         if (!formRepository.existsByFormId(formId)) {
             return new ResponseEntity<>("formId is not existed", HttpStatus.CONFLICT);
         }
@@ -142,7 +139,7 @@ public class OwnerResources {
      */
 
     @DeleteMapping("/form/change-status")
-    public ResponseEntity<String> changeStatusStopRelease(@RequestParam String formId) throws Exception {
+    public ResponseEntity<?> changeStatusStopRelease(@RequestParam String formId) throws Exception {
         if (!formRepository.existsByFormId(formId)) {
             return new ResponseEntity<>("formId is not existed", HttpStatus.CONFLICT);
         }

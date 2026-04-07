@@ -9,6 +9,7 @@ import com.vnu.uet.service.rest.client.EflowClient;
 import com.vnu.uet.service.dto.StandardResponse;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,19 +57,16 @@ public class CommonResource {
             message = "Form not exist";
             edit = false;
             StandardResponse standardResponse = new StandardResponse(message, edit);
-            return ResponseEntity.ok(gson.toJson(standardResponse));
+            return ResponseEntity.ok(standardResponse);
         }
 
         // Kiểm tra status từ eFlow
         try {
             ResponseEntity<Boolean> eflowResponse = eflowClient.isFormReleasing(formId);
-            System.out.println("DEBUG: eFlow response: " + eflowResponse.getBody());
             if (eflowResponse.getBody() != null && eflowResponse.getBody()) {
                 lockStructure = true;
-                System.out.println("DEBUG: lockStructure set to true");
             }
         } catch (Exception e) {
-            // Log error or handle if eFlow is down
             message = "Error checking form status from eFlow";
         }
 
@@ -83,7 +81,7 @@ public class CommonResource {
                 message = "Can not edit";
                 edit = false;
                 StandardResponse standardResponse = new StandardResponse(message, edit);
-                return ResponseEntity.ok(gson.toJson(standardResponse));
+                return ResponseEntity.ok(standardResponse);
             } else {
                 message = "Can edit";
                 edit = true;
@@ -95,7 +93,7 @@ public class CommonResource {
         data.put("lockStructure", lockStructure);
 
         StandardResponse standardResponse = new StandardResponse(message, data);
-        return ResponseEntity.ok(gson.toJson(standardResponse));
+        return ResponseEntity.ok(standardResponse);
     }
 
     /*
