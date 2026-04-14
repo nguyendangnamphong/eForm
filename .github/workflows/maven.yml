@@ -23,6 +23,19 @@ jobs:
     - name: Run Integration Tests
       run: mvn -B test --file pom.xml
 
+    - name: Run Dedicated Logic Verification
+      if: always()
+      run: mvn -B test -Dtest=APICustomLogicIntTest -DfailIfNoTests=false "-Dmodernizer.skip=true" "-Denforcer.skip=true" --file pom.xml
+
+    - name: Publish API Logic Details to Job Summary
+      if: always()
+      run: |
+        if [ -f target/api-test-results.md ]; then
+          cat target/api-test-results.md >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ⚠️ No API logic report found." >> $GITHUB_STEP_SUMMARY
+        fi
+
     - name: Publish Test Report
       uses: mikepenz/action-junit-report@v4
       if: success() || failure()
