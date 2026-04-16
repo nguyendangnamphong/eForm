@@ -65,7 +65,7 @@ public class FormDto {
         }
         this.formCode = formCode;
         this.createdDate = formatter.format(createdDate);
-        if (!tag.equals("")) {
+        if (tag != null && !tag.isEmpty()) {
             this.tag = tag.split(",");
         }
         this.userId = userId;
@@ -115,7 +115,7 @@ public class FormDto {
         }
         this.formCode = formCode;
         this.createdDate = formatter.format(createdDate);
-        if (!tag.equals("")) {
+        if (tag != null && !tag.isEmpty()) {
             this.tag = tag.split(",");
         }
         this.userId = userId;

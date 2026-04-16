@@ -91,6 +91,14 @@ public class OwnerService {
         Instant currentTime = Instant.now();
         Form form1 = formMapper.toForm(form, currentUser.getId(), currentUser.getLogin(), currentUser.getOrgIn(),
                 currentUser.getCustId(), IDGenerator.generateIDSuffix(currentUser.getId()), currentTime);
+
+        if (form1.getFormName() == null || form1.getFormName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Form name cannot be empty");
+        }
+        if (form1.getBeginTime() != null && form1.getEndTime() != null && form1.getBeginTime().isAfter(form1.getEndTime())) {
+            throw new IllegalArgumentException("Begin time must be before end time");
+        }
+
         form1 = formRepository.save(form1);
 
         Acl authorize = new Acl();

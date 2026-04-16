@@ -32,7 +32,7 @@ public class FormMapper {
         form.setBeginTime(DateConverter.parseStringToZonedDateTime(requestAddForm.getBeginTime()));
         form.setEndTime(DateConverter.parseStringToZonedDateTime3(requestAddForm.getEndTime()));
         form.setDescription(requestAddForm.getDescribeForm());
-        form.setJsonForm("[]");
+        form.setJsonForm(requestAddForm.getJsonForm() != null ? requestAddForm.getJsonForm() : "[]");
         form.setJsonFormCondition("[]");
         form.setCreatedBy(login.trim());
         form.setOrgIn(orgIn);

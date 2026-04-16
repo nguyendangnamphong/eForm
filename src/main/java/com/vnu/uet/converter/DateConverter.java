@@ -5,37 +5,26 @@ import java.time.format.DateTimeFormatter;
 
 public class DateConverter {
     public static Instant parseStringToZonedDateTime(String dateString) {
+        if (dateString == null || dateString.isEmpty()) return null;
+        String normalizedDate = dateString.replace("-", "/").split(" ")[0];
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-
-        // Chuyển đổi chuỗi thành LocalDate
-        LocalDate localDate = LocalDate.parse(dateString, formatter);
-
-        // Tạo ZonedDateTime với múi giờ +7 và giờ, phút, giây là 00:00:00
+        LocalDate localDate = LocalDate.parse(normalizedDate, formatter);
         ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh"));
-
-        // Chuyển đổi ZonedDateTime thành Instant
-        Instant instant = zonedDateTime.toInstant();
-        return instant;
+        return zonedDateTime.toInstant();
     }
 
     public static ZonedDateTime parseStringToZonedDateTime2(String dateStr) {
+        if (dateStr == null || dateStr.isEmpty()) return null;
         return ZonedDateTime.parse(dateStr, DateTimeFormatter.ISO_DATE_TIME);
     }
 
     public static Instant parseStringToZonedDateTime3(String dateString) {
+        if (dateString == null || dateString.isEmpty()) return null;
+        String normalizedDate = dateString.replace("-", "/").split(" ")[0];
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-
-        // Chuyển đổi chuỗi thành LocalDate
-        LocalDate localDate = LocalDate.parse(dateString, formatter);
-
-        // Tạo LocalDateTime với giờ, phút, giây là 23:59:59
+        LocalDate localDate = LocalDate.parse(normalizedDate, formatter);
         LocalDateTime endOfDay = localDate.atTime(23, 59, 59);
-
-        // Tạo ZonedDateTime với múi giờ +7
         ZonedDateTime zonedDateTime = endOfDay.atZone(ZoneId.of("Asia/Ho_Chi_Minh"));
-
-        // Chuyển đổi ZonedDateTime thành Instant
-        Instant instant = zonedDateTime.toInstant();
-        return instant;
+        return zonedDateTime.toInstant();
     }
 }

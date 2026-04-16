@@ -1,5 +1,6 @@
 package com.vnu.uet.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vnu.uet.domain.Form;
 import com.vnu.uet.repository.FormRepository;
 import com.vnu.uet.request.*;
@@ -35,7 +36,7 @@ import java.util.List;
 public class OwnerResources {
     private final FormRepository formRepository;
     private final OwnerService ownerService;
-    Gson gson = new Gson();
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/form")
     public ResponseEntity<?> saveForm(@RequestBody @Valid RequestAddForm form) throws Exception {
@@ -112,7 +113,7 @@ public class OwnerResources {
     public ResponseEntity<String> getMenuViews(Pageable pageable) throws Exception {
         FormSearchOwnerDto formSearchOwnerDto = new FormSearchOwnerDto();
         Page<FormDto> formDtos = ownerService.findFormOwner1(formSearchOwnerDto, pageable);
-        return ResponseEntity.ok(gson.toJson(formDtos.getContent()));
+        return ResponseEntity.ok(objectMapper.writeValueAsString(formDtos.getContent()));
     }
 
     @GetMapping("/form/change-status")
@@ -121,7 +122,7 @@ public class OwnerResources {
             return new ResponseEntity<>("formId is not existed", HttpStatus.CONFLICT);
         }
         Form form = ownerService.changeToRelease(formId);
-        return ResponseEntity.ok(gson.toJson(form));
+        return ResponseEntity.ok(objectMapper.writeValueAsString(form));
     }
 
     /*
@@ -134,7 +135,7 @@ public class OwnerResources {
      * return new ResponseEntity<>("formId is not existed", HttpStatus.CONFLICT);
      * }
      * Form form = ownerService.changeToEdit(formId);
-     * return ResponseEntity.ok(gson.toJson(form));
+     * return ResponseEntity.ok(objectMapper.writeValueAsString(form));
      * }
      */
 
@@ -144,7 +145,7 @@ public class OwnerResources {
             return new ResponseEntity<>("formId is not existed", HttpStatus.CONFLICT);
         }
         Form form = ownerService.changeToStopRelease(formId);
-        return ResponseEntity.ok(gson.toJson(form));
+        return ResponseEntity.ok(objectMapper.writeValueAsString(form));
     }
 
     /*
@@ -168,7 +169,7 @@ public class OwnerResources {
      * public ResponseEntity<?> restoreForm(@RequestParam String versionId) throws
      * Exception {
      * Form form = ownerService.restoreForm(versionId);
-     * return ResponseEntity.ok(gson.toJson(form));
+     * return ResponseEntity.ok(objectMapper.writeValueAsString(form));
      * }
      */
 
@@ -191,7 +192,7 @@ public class OwnerResources {
     public ResponseEntity<?> duplicateForm(@RequestParam String formId, @RequestBody RequestAddForm requestAddForm)
             throws Exception {
         Form form = ownerService.duplicateForm(formId, requestAddForm);
-        return ResponseEntity.ok(gson.toJson(form));
+        return ResponseEntity.ok(objectMapper.writeValueAsString(form));
     }
 
     /*

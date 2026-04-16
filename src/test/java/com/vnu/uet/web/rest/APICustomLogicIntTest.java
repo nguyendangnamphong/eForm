@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vnu.uet.EformApp;
 import java.nio.file.Files;
@@ -50,6 +51,7 @@ class APICustomLogicIntTest {
     private ObjectMapper objectMapper;
 
     private static final List<TestDetail> testDetails = new ArrayList<>();
+    private static String createdFormId;
 
     private static class TestDetail {
         String endpoint;
@@ -164,12 +166,20 @@ class APICustomLogicIntTest {
             "\"describeForm\":\"Biểu mẫu dùng cho mục đích kiểm thử tự động\"," +
             "\"jsonForm\":\"[]\"," +
             "\"tag\":\"test\"," +
-            "\"beginTime\":\"2026-01-01 00:00:00\"," +
-            "\"endTime\":\"2049-12-31 23:59:59\"" +
+            "\"beginTime\":\"2026-01-01\"," +
+            "\"endTime\":\"2049-12-31\"" +
             "}";
-        performAndLog("POST", "/api/owner/form", body,
+        MvcResult result = performAndLog("POST", "/api/owner/form", body,
             "[POST /api/owner/form] Tạo mới biểu mẫu với đầy đủ thông tin hợp lệ",
             "Biểu mẫu được tạo thành công, trả về formId mới sinh (HTTP 200)");
+        
+        if (result.getResponse().getStatus() == 200) {
+            String responseBody = result.getResponse().getContentAsString();
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
+            if (jsonNode.has("formId")) {
+                createdFormId = jsonNode.get("formId").asText();
+            }
+        }
     }
 
     @Test
@@ -206,7 +216,8 @@ class APICustomLogicIntTest {
 
     @Test
     void test05_GetForm_ValidId() throws Exception {
-        performAndLog("GET", "/api/owner/form?formId=test-form-123", null,
+        String url = "/api/owner/form?formId=" + (createdFormId != null ? createdFormId : "test-form-123");
+        performAndLog("GET", url, null,
             "[GET /api/owner/form] Lấy thông tin form với formId hợp lệ",
             "Trả về toàn bộ thông tin biểu mẫu (HTTP 200)");
     }
@@ -232,15 +243,15 @@ class APICustomLogicIntTest {
     @Test
     void test08_UpdateForm_HappyPath() throws Exception {
         String body = "{" +
-            "\"formId\":\"test-form-123\"," +
+            "\"formId\":\"" + (createdFormId != null ? createdFormId : "test-form-123") + "\"," +
             "\"formCode\":\"TF-123-UPDATED\"," +
             "\"formName\":\"Biểu mẫu đã cập nhật\"," +
             "\"describeForm\":\"Mô tả mới sau khi cập nhật\"," +
             "\"jsonForm\":\"[{\\\"id\\\":\\\"row-1\\\",\\\"type\\\":\\\"row\\\"}]\"," +
             "\"jsonFormCondition\":\"[]\"," +
             "\"tag\":\"updated\"," +
-            "\"beginTime\":\"2026-01-01 00:00:00\"," +
-            "\"endTime\":\"2049-12-31 23:59:59\"," +
+            "\"beginTime\":\"2026-01-01\"," +
+            "\"endTime\":\"2049-12-31\"," +
             "\"variableArr\":[{\"code\":\"row-1\",\"variableName\":\"row\",\"variableType\":\"row\"}]" +
             "}";
         performAndLog("PUT", "/api/owner/form", body,
@@ -312,10 +323,11 @@ class APICustomLogicIntTest {
             "\"describeForm\":\"Bản sao nhân bản từ form kiểm thử\"," +
             "\"jsonForm\":\"[]\"," +
             "\"tag\":\"copy\"," +
-            "\"beginTime\":\"2026-01-01 00:00:00\"," +
-            "\"endTime\":\"2049-12-31 23:59:59\"" +
+            "\"beginTime\":\"2026-01-01\"," +
+            "\"endTime\":\"2049-12-31\"" +
             "}";
-        performAndLog("POST", "/api/owner/duplicate-form?formId=test-form-123", body,
+        String url = "/api/owner/duplicate-form?formId=" + (createdFormId != null ? createdFormId : "test-form-123");
+        performAndLog("POST", url, body,
             "[POST /api/owner/duplicate-form] Nhân bản biểu mẫu đang tồn tại trong hệ thống",
             "Biểu mẫu mới được tạo ra giống hệt bản gốc, trả về formId mới (HTTP 200)");
     }
@@ -340,7 +352,8 @@ class APICustomLogicIntTest {
 
     @Test
     void test16_CheckEdit_FormNotInActiveFlow() throws Exception {
-        performAndLog("GET", "/api/common/check-edit?formId=test-form-123", null,
+        String url = "/api/common/check-edit?formId=" + (createdFormId != null ? createdFormId : "test-form-123");
+        performAndLog("GET", url, null,
             "[GET /api/common/check-edit] Kiểm tra quyền chỉnh sửa biểu mẫu không thuộc luồng đang Phát hành",
             "Trả về cho phép chỉnh sửa đầy đủ (cả variable code lẫn element) - HTTP 200");
     }
@@ -366,7 +379,8 @@ class APICustomLogicIntTest {
 
     @Test
     void test19_PublishForm_ValidId() throws Exception {
-        performAndLog("GET", "/api/owner/form/change-status?formId=test-form-123", null,
+        String url = "/api/owner/form/change-status?formId=" + (createdFormId != null ? createdFormId : "test-form-123");
+        performAndLog("GET", url, null,
             "[GET /api/owner/form/change-status] Phát hành biểu mẫu hợp lệ (statusForm: editing → published)",
             "Form chuyển sang trạng thái Phát hành (statusForm=2), trả về thông tin form mới (HTTP 200)");
     }
@@ -391,7 +405,8 @@ class APICustomLogicIntTest {
 
     @Test
     void test22_UnpublishForm_ValidId() throws Exception {
-        performAndLog("DELETE", "/api/owner/form/change-status?formId=test-form-123", null,
+        String url = "/api/owner/form/change-status?formId=" + (createdFormId != null ? createdFormId : "test-form-123");
+        performAndLog("DELETE", url, null,
             "[DELETE /api/owner/form/change-status] Ngừng phát hành biểu mẫu đang ở trạng thái Phát hành",
             "Form chuyển sang trạng thái Ngừng phát hành (statusForm=3), trả về thông tin form (HTTP 200)");
     }
